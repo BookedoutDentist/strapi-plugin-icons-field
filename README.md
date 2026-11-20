@@ -13,8 +13,52 @@
 </div>
 
 > **BookedoutDentist fork** of [dupflo/strapi-plugin-icons-field](https://github.com/dupflo/strapi-plugin-icons-field).
-> Adds [search synonyms](#search-synonyms-) via a `_synonyms.json` mapping file. Our changes live on the
-> `bod/synonyms` branch and are released as tags like `v1.2.5-bod.1`; `main` mirrors upstream.
+> Adds [search synonyms](#search-synonyms-) via a `_synonyms.json` mapping file.
+> `main` contains our changes; releases are tags like `v1.2.5-bod.1`. See [Entwicklung & Release (BookedoutDentist)](#entwicklung--release-bookedoutdentist).
+
+## Entwicklung & Release (BookedoutDentist)
+
+Strapi (`bod-ads-lp-za-strapi`) installiert dieses Plugin direkt per Git-Tag:
+
+```json
+"strapi-plugin-icons-field": "github:BookedoutDentist/strapi-plugin-icons-field#v1.2.5-bod.1"
+```
+
+**`dist/` ist eingecheckt und wird nicht in Strapi gebaut.** Strapi bekommt mit dem Tag den fertig gebauten Code.
+Wer den Quellcode in `admin/src` oder `server/src` ändert, muss deshalb vor dem Commit selbst bauen.
+
+1. Einmalig: `npm ci`
+2. Code ändern
+3. Bauen und prüfen:
+   ```bash
+   npm run build
+   npx tsc -p server/tsconfig.json --noEmit && npx tsc -p admin/tsconfig.json --noEmit
+   ```
+4. Version erhöhen (Schema `<upstream-version>-bod.<n>`), Quellcode **und** `dist/` committen:
+   ```bash
+   npm version 1.2.5-bod.2 --no-git-tag-version
+   git add -A && git commit -m "feat: ..."
+   ```
+5. Pushen und taggen:
+   ```bash
+   git tag v1.2.5-bod.2 && git push origin main --tags
+   ```
+6. In `bod-ads-lp-za-strapi` den Tag in `package.json` anpassen, `npm install` ausführen und `package.json` + `package-lock.json` committen.
+
+Ohne neuen Tag und Schritt 6 kommt eine Änderung nie in Strapi an. Einen Tag nie verschieben, sondern immer einen neuen anlegen.
+
+**Testen ohne Release:** `npm pack` erzeugt ein `.tgz`, das man in Strapi mit
+`npm install --no-save /pfad/strapi-plugin-icons-field-<version>.tgz` einspielt. Danach `node_modules/.strapi/vite`
+löschen und Strapi neu starten. Ein normales `npm install` stellt wieder die Version aus `package.json` her.
+
+**Updates vom Original übernehmen:**
+
+```bash
+git remote add upstream https://github.com/dupflo/strapi-plugin-icons-field.git   # einmalig
+git fetch upstream && git merge upstream/main
+```
+
+Danach neu bauen und wie oben einen neuen `-bod.<n>`-Tag veröffentlichen.
 
 ![Plugin Icon Field](https://res.cloudinary.com/djqnlydhz/image/upload/v1775143825/github/ct-plugin-icons-field_c4zuoi.webp)
 
